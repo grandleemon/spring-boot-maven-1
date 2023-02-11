@@ -26,7 +26,8 @@ public class Main {
 		return new GreetResponse("Hello");
 	}
 
-	record GreetResponse(String greet){}
+	record GreetResponse(String greet) {
+	}
 
 	@GetMapping("/customers")
 	public List<Customer> getCustomer() {
@@ -49,5 +50,31 @@ public class Main {
 		customer.setAge(request.age());
 
 		customerRepository.save(customer);
+	}
+
+	record CustomerToUpdate(
+					String name,
+					String email,
+					Integer age
+	) {
+
+	}
+
+	@PutMapping("/customers/{customerId}")
+	public Customer updateCustomer(
+					@PathVariable("customerId") Integer id,
+					@RequestBody CustomerToUpdate customer
+	) {
+		Customer customerToUpdate = customerRepository.findById(id).orElseThrow();
+		customerToUpdate.setAge(customer.age());
+		customerToUpdate.setEmail(customer.email());
+		customerToUpdate.setName(customer.name());
+
+		return customerRepository.save(customerToUpdate);
+	}
+
+	@DeleteMapping("/customers/{customerId}")
+	public void deleteCustomer(@PathVariable("customerId") Integer id) {
+		customerRepository.deleteById(id);
 	}
 }
